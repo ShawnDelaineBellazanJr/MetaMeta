@@ -3,68 +3,52 @@ description:
 globs: 
 alwaysApply: false
 ---
-# Cursor Rule: 001_core.mdc
-# Title: AgentCore Standards and Runtime Enforcement
-
-## Purpose:
-Establishes architectural conventions and implementation standards for the AgentCore framework, which powers modular assistants using generic base agents, a runtime registry, unit-of-work execution, and Prompty support.
+file: .cursor/rules/001_core.mdc
 
 ---
 
-## Requirements
+rule: enforce_core_architecture
 
-### ✅ Agent Base Design
-- All core agents MUST inherit from a generic base type: `AgentBase<TRequest, TResponse>`
-- Each agent MUST override `ExecuteAsync(TRequest)` to implement task logic
-- Each agent MUST define a unique agent `Name` property matching registration metadata
+when:
+  - file.extension == ".cs"
+  - file.path.includes("/MetaMeta.Core")
 
-### ✅ Registry Pattern
-- There MUST be an `IAgent` interface for uniform invocation
-- The system MUST include an `AgentRegistry` that allows:
-  - Registering agents by name
-  - Listing all available agents
-  - Retrieving agents by name for invocation
-- Optional metadata such as tags, descriptions, or prompt files MAY be included
-
-### ✅ AgentUnitOfWork
-- There MUST be a central `AgentUnitOfWork` class that:
-  - Accepts agent names and payloads
-  - Invokes the correct agent using the registry
-  - Supports chaining and contextual routing
-
-### ✅ Prompty Loader
-- Agents MUST use `.prompty` files for prompt templates
-- Prompts MUST be loaded using a reusable loader such as `StandardPromptyLoader` or a kernel extension
-- Prompts MUST NOT be embedded inline in agent logic
-
-### ✅ Kernel & Input Safety
-- Input JSON MUST be safely deserialized with validation
-- KernelFunction invocation MUST support error handling
-- Agents MAY log input/output using a shared logging utility
+then:
+  - assert: file.contains("namespace MetaMeta.Core")
+    message: "All core files must be in the MetaMeta.Core namespace."
+  - assert: file.contains("public abstract class AgentRequest")
+    or: file.contains("public abstract class AgentResponse")
+    message: "Core models must define base agent request and response classes."
 
 ---
 
-## Folder Structure (Required)
+rule: enforce_semantic_kernel_usage
 
-```
-Core/
-├── Agents/
-│   ├── AgentBase.cs
-│   ├── IAgent.cs
-│   └── AgentRegistry.cs
-├── Execution/
-│   └── AgentUnitOfWork.cs
-├── IO/
-│   └── StandardPromptyLoader.cs
-├── Extensions/
-│   └── KernelExtensions.cs
-├── Models/
-│   ├── AgentContext.cs
-│   └── AgentMetadata.cs
-```
+when:
+  - file.extension == ".cs"
+  - file.contents.includes("SemanticKernel")
+
+then:
+  - assert: file.contents.includes("Microsoft.SemanticKernel")
+    message: "Ensure Semantic Kernel is used through Microsoft.SemanticKernel namespace."
+  - assert: file.contents.includes("ChatCompletionAgent")
+    or: file.contents.includes("Kernel")
+    message: "Agents must leverage Semantic Kernel kernel or base agents."
 
 ---
 
-## Enforcement
+rule: validate_prompty_file_structure
 
-> This rule ensures all assistants and runtime logic rely on a consistent, pluggable, observable, and testable Core system. Cursor agents should verify all assistants subclass `AgentBase<T, U>` and interact only through the defined Core APIs.
+when:
+  - file.extension == ".prompty"
+  - file.path.includes("/Prompts")
+
+then:
+  - assert: file.contains("name:")
+    message: "Prompty files must define a 'name' field."
+  - assert: file.contains("description:")
+    message: "Prompty files must include a 'description' section."
+  - assert: file.contains("inputs:")
+    message: "Prompty files should define 'inputs' required by the agent."
+  - assert: file.contains("template:")
+    message: "Prompty files must include a 'template' section with the prompt body."

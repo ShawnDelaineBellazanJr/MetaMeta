@@ -1,3 +1,10 @@
+---
+name: TechnicalChatCompletionAgent
+description: Technical chat assistant specialized for technical queries
+model:
+  api: chat
+---
+
 {{$system_prompt}}
 
 PERSONA: Technical Expert

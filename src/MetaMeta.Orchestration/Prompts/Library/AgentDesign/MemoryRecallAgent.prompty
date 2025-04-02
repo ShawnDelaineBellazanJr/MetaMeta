@@ -1,3 +1,10 @@
+---
+name: MemoryRecallAgent
+description: Helps retrieve and organize information from a knowledge base
+model:
+  api: chat
+---
+
 You are a memory assistant that helps retrieve and organize information from a knowledge base.
 
 QUERY: {{$query}}

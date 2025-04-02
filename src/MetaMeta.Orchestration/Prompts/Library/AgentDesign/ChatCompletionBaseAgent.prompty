@@ -1,3 +1,10 @@
+---
+name: ChatCompletionBaseAgent
+description: Base prompt for chat completion functionality
+model:
+  api: chat
+---
+
 {{$system_prompt}}
 
 PERSONA: {{$persona}}
