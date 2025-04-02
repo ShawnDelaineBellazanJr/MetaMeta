@@ -13,6 +13,7 @@ namespace MetaMeta.AgentHost
     public class AgentHostService : IAgentHostService
     {
         private readonly ILogger<AgentHostService> _logger;
+        
 
         /// <summary>
         /// Initializes a new instance of the AgentHostService class.

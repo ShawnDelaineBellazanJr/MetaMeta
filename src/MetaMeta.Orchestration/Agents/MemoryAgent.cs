@@ -103,7 +103,7 @@ public class MemoryAgent
         catch (Exception ex)
         {
             _logger.LogError(ex, "Error retrieving memory for key '{Key}' from collection '{Collection}'", key, collection);
-            return null;
+            return string.Empty;
         }
     }
     

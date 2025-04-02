@@ -23,28 +23,29 @@ public static class DependencyInjection
     {
         // We need to adapt the configuration object to extract values
         var configAdapter = new ConfigurationAdapter(configuration);
-        
+
         // Register the Semantic Kernel
         services.AddScoped<Kernel>(provider =>
         {
             var builder = Kernel.CreateBuilder();
             var logger = provider.GetRequiredService<ILogger<Kernel>>();
-            
-            try {
+
+            try
+            {
                 // Add AI services based on configuration
                 var aiServiceType = configAdapter.GetValue("AI:ServiceType");
-                
+
                 if (aiServiceType == "OpenAI")
                 {
                     var modelId = configAdapter.GetValue("AI:OpenAI:ModelId") ?? "gpt-4";
                     var apiKey = configAdapter.GetValue("AI:OpenAI:ApiKey");
-                    
+
                     if (string.IsNullOrEmpty(apiKey))
                     {
                         logger.LogWarning("OpenAI API key not found in configuration");
                         throw new InvalidOperationException("OpenAI API key is missing");
                     }
-                    
+
                     logger.LogInformation("Adding OpenAI chat completion with model: {ModelId}", modelId);
                     builder.AddOpenAIChatCompletion(modelId, apiKey);
                 }
@@ -53,13 +54,13 @@ public static class DependencyInjection
                     var deploymentName = configAdapter.GetValue("AI:AzureOpenAI:DeploymentName");
                     var endpoint = configAdapter.GetValue("AI:AzureOpenAI:Endpoint");
                     var apiKey = configAdapter.GetValue("AI:AzureOpenAI:ApiKey");
-                    
+
                     if (string.IsNullOrEmpty(deploymentName) || string.IsNullOrEmpty(endpoint) || string.IsNullOrEmpty(apiKey))
                     {
                         logger.LogWarning("Azure OpenAI configuration is incomplete");
                         throw new InvalidOperationException("Azure OpenAI configuration is incomplete");
                     }
-                    
+
                     logger.LogInformation("Adding Azure OpenAI chat completion with deployment: {DeploymentName}", deploymentName);
                     builder.AddAzureOpenAIChatCompletion(deploymentName, endpoint, apiKey);
                 }
@@ -69,22 +70,24 @@ public static class DependencyInjection
                     throw new ArgumentException($"Unsupported AI service type: {aiServiceType}");
                 }
             }
-            catch (Exception ex) {
+            catch (Exception ex)
+            {
                 logger.LogError(ex, "Failed to configure AI service. Using dummy kernel for testing only!");
                 // In development/testing, we might want to continue with a dummy kernel
                 // In production, we should probably rethrow
             }
-            
+
             return builder.Build();
         });
-        
+
         // Register the PromptLoader
-        services.AddSingleton<PromptLoader>(sp => {
+        services.AddSingleton<PromptLoader>(sp =>
+        {
             var promptFactory = sp.GetRequiredService<MetaMeta.Core.Abstractions.IPromptTemplateFactory>();
             var logger = sp.GetRequiredService<ILogger<PromptLoader>>();
             return new PromptLoader(promptFactory, logger);
         });
-        
+
         // Register all agents
         services.AddScoped<PlannerAgent>();
         services.AddScoped<MemoryAgent>();
@@ -92,32 +95,32 @@ public static class DependencyInjection
         services.AddScoped<ReasoningAgent>();
         services.AddScoped<ContentAgent>();
         services.AddScoped<ChatCompletionAgent>();
-        
+
         // Register the Chat Completion Service
         services.AddScoped(provider =>
         {
             var kernel = provider.GetRequiredService<Kernel>();
             return kernel.GetRequiredService<Microsoft.SemanticKernel.ChatCompletion.IChatCompletionService>();
         });
-        
+
         // Register the Orchestrator
         services.AddScoped<Orchestrator>();
-        
+
         return services;
     }
-    
+
     /// <summary>
     /// Simple adapter for configuration to avoid direct dependency on Microsoft.Extensions.Configuration.
     /// </summary>
     private class ConfigurationAdapter
     {
         private readonly object _configuration;
-        
+
         public ConfigurationAdapter(object configuration)
         {
             _configuration = configuration;
         }
-        
+
         public string GetValue(string key)
         {
             // Use reflection to access the indexer on IConfiguration
@@ -128,38 +131,38 @@ public static class DependencyInjection
                 if (indexerProperty != null)
                 {
                     var value = indexerProperty.GetValue(_configuration, new object[] { key });
-                    return value?.ToString();
+                    return value?.ToString() ?? string.Empty;
                 }
-                
+
                 // Try with a method called GetSection + indexer for nested sections
                 var parts = key.Split(':');
                 object section = _configuration;
-                
+
                 foreach (var part in parts)
                 {
                     var getSectionMethod = section.GetType().GetMethod("GetSection", new[] { typeof(string) });
                     if (getSectionMethod == null)
-                        return null;
-                        
+                        return string.Empty;
+
                     section = getSectionMethod.Invoke(section, new object[] { part });
                     if (section == null)
-                        return null;
+                        return string.Empty;
                 }
-                
+
                 var valueProperty = section.GetType().GetProperty("Value");
                 if (valueProperty != null)
                 {
                     var value = valueProperty.GetValue(section);
-                    return value?.ToString();
+                    return value?.ToString() ?? string.Empty;
                 }
             }
             catch
             {
-                // If anything goes wrong, return null
-                return null;
+                // If anything goes wrong, return empty string
+                return string.Empty;
             }
-            
-            return null;
+
+            return string.Empty;
         }
     }
-} 
+}

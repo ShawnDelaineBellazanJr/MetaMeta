@@ -8,6 +8,10 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <PackageReference Include="Microsoft.SemanticKernel.Agents.Core" />
+  </ItemGroup>
+
+  <ItemGroup>
     <ProjectReference Include="..\MetaMeta.Core\MetaMeta.Core.csproj" />
     <ProjectReference Include="..\MetaMeta.ServiceDefaults\MetaMeta.ServiceDefaults.csproj" />
   </ItemGroup>
