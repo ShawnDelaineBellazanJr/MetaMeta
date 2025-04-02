@@ -1,67 +1,79 @@
+---
+description: 
+globs: 
+alwaysApply: false
+---
 # Cursor Rule: 006_prompts.mdc
 # Title: Prompty Standards for Assistant Prompt Templates
 
 ## Purpose:
-Ensure all assistant logic is powered by reusable, version-controlled Prompty templates. Prompts must follow a structured YAML format and support clean, debuggable, transparent behavior across all agents.
+Ensure all assistant logic is powered by reusable, version-controlled Prompty templates. Prompts must follow a structured format, be organized by agent category, and support clean, debuggable, transparent behavior across all agents.
 
 ---
 
 ## Requirements
 
 ### ✅ Prompty Files
-- All prompts MUST be stored as `.prompty` YAML files
-- Prompts MUST include:
-  - `name`
-  - `description`
-  - `model` section
-  - one or more `system`, `user`, or `assistant` roles
+- All prompts MUST be stored as `.prompty` files
+- Prompts MUST use Handlebars syntax with:
+  - Clear agent purpose at the beginning
+  - Parameters marked as `{{$parameter_name}}`
+  - Conditional sections with `{{#if}}` where appropriate
+  - Clear output instructions
 
 ### ✅ File & Folder Layout
-- Prompty files MUST live in:
+- Prompty files MUST live in one of these category folders:
   ```
-  src/<AssistantName>/Prompts/<PromptName>.prompty
+  src/MetaMeta.Orchestration/Prompts/
+  ├── AgentDesign/         # Agent selection and architecture prompts
+  ├── ReasoningAgents/     # Reasoning, chat, and thinking prompts
+  ├── ExecutionAgents/     # Planning, execution, and tool usage prompts
+  ├── MemoryAgents/        # Memory, recall, and summarization prompts
+  └── ContentCreation/     # Content generation prompts
   ```
 
 ### ✅ Naming Convention
-- Prompt files MUST be named with PascalCase and end in `Prompt` (e.g., `PlanningPrompt.prompty`)
-- Prompt `name:` property inside file MUST match the filename
+- Prompt files MUST be named with PascalCase
+- Agent prompts MUST end with `Agent.prompty` (e.g., `PlanningAgent.prompty`)
+- Other prompt templates MUST clearly describe their purpose (e.g., `ExecutionPlan.prompty`)
 
 ### ✅ Prompt Usage in Code
-- Agents MUST use `kernel.CreateFunctionFromPromptyFile(...)` or equivalent loader
+- Agents MUST use `PromptLoader` to load templates
 - Inline prompts in code are NOT allowed
-- Prompt input parameters MUST use `{{$input}}` or well-typed keys
+- Prompt parameters MUST use defined keys matching the template variables
 
 ---
 
 ## Optional Enhancements
 
-- Prompts MAY use `{{$input}}`, `{{$goal}}`, `{{$task}}` etc. with parameter dictionaries
-- Prompts MAY include `examples:` section for test input/output
-- Prompts MAY include `metadata:` for usage classification
+- Prompts MAY include multiple components with `{{> component}}` partials
+- Prompts MAY include example sections for documentation
+- Prompts MAY use formatting with indentation and spacing for readability
 
 ---
 
 ## Example Prompt Template
 
-```yaml
----
-name: PlanningPrompt
-description: Breaks goals into dev tasks
-model:
-  api: chat
----
+```handlebars
+You are a planning agent that breaks down software goals into actionable tasks.
 
-system:
-You are a helpful planning assistant that breaks down software goals.
+GOAL: {{$goal}}
 
-user:
-{{$input}}
+{{#if $context}}
+CONTEXT:
+{{$context}}
+{{/if}}
 
-assistant:
+Your task is to create a step-by-step development plan with:
+1. Clear task descriptions
+2. Dependencies between tasks
+3. Estimated complexity (1-5)
+
+Respond with a JSON array of tasks:
 ```
 
 ---
 
 ## Enforcement
 
-> Cursor agents enforcing this rule must ensure prompt files are external `.prompty` YAML files with valid schema, live in proper assistant folders, and are loaded via Core IO loaders. Prompts must be traceable, clean, and versioned.
+> Cursor agents enforcing this rule must ensure prompt files are organized in the appropriate category folders, follow the `.prompty` extension standard, use proper Handlebars syntax, and are loaded via the PromptLoader. All prompts must be traceable, clean, and version-controlled.

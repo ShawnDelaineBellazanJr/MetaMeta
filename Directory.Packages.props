@@ -1,0 +1,92 @@
+<Project>
+  <PropertyGroup>
+    <ManagePackageVersionsCentrally>true</ManagePackageVersionsCentrally>
+    <CentralPackageTransitivePinningEnabled>true</CentralPackageTransitivePinningEnabled>
+    <!-- Enhanced security settings -->
+    <CentralPackageVersionsSingleFile>true</CentralPackageVersionsSingleFile>
+    <EnablePackageVersionOverride>false</EnablePackageVersionOverride>
+    <VersionOverrideWarningLevel>error</VersionOverrideWarningLevel>
+  </PropertyGroup>
+  
+  <!-- Define key version variables for related packages -->
+  <PropertyGroup>
+    <!-- Core framework versions -->
+    <MSExtensionsVersion>10.0.0-preview.2.25163.2</MSExtensionsVersion>
+    <AspNetCoreVersion>8.0.0</AspNetCoreVersion>
+    <OpenTelemetryVersion>1.11.2</OpenTelemetryVersion>
+    <OpenTelemetryInstrumentationVersion>1.11.1</OpenTelemetryInstrumentationVersion>
+    <SwashbuckleVersion>8.1.0</SwashbuckleVersion>
+    
+    <!-- AI framework versions -->
+    <SemanticKernelVersion>1.44.0</SemanticKernelVersion>
+    <SemanticKernelPreviewVersion>1.44.0-preview</SemanticKernelPreviewVersion>
+  </PropertyGroup>
+  
+  <ItemGroup>
+    <!-- Azure -->
+    <PackageVersion Include="Azure.AI.Inference" Version="1.0.0-beta.4" />
+    <PackageVersion Include="Azure.AI.OpenAI" Version="2.2.0-beta.4" />
+    <PackageVersion Include="Azure.Identity" Version="1.13.2" />
+    
+    <!-- Entity Framework -->
+    <PackageVersion Include="Microsoft.EntityFrameworkCore" Version="9.0.3" />
+    
+    <!-- gRPC -->
+    <PackageVersion Include="Google.Protobuf" Version="3.30.2" />
+    <PackageVersion Include="Grpc.AspNetCore" Version="2.70.0" />
+    <PackageVersion Include="Grpc.Net.Client" Version="2.70.0" />
+    <PackageVersion Include="Grpc.Net.ClientFactory" Version="2.70.0" />
+    <PackageVersion Include="Grpc.Tools" Version="2.71.0" />
+    
+    <!-- Microsoft Extensions -->
+    <PackageVersion Include="Microsoft.AspNetCore.OpenApi" Version="$(AspNetCoreVersion)" />
+    <PackageVersion Include="Microsoft.Extensions.Azure" Version="1.11.0" />
+    <PackageVersion Include="Microsoft.Extensions.Caching.StackExchangeRedis" Version="8.0.0" />
+    <PackageVersion Include="Microsoft.Extensions.Configuration" Version="$(MSExtensionsVersion)" />
+    <PackageVersion Include="Microsoft.Extensions.Configuration.Abstractions" Version="$(MSExtensionsVersion)" />
+    <PackageVersion Include="Microsoft.Extensions.Configuration.Binder" Version="$(MSExtensionsVersion)" />
+    <PackageVersion Include="Microsoft.Extensions.Configuration.CommandLine" Version="$(MSExtensionsVersion)" />
+    <PackageVersion Include="Microsoft.Extensions.Configuration.EnvironmentVariables" Version="$(MSExtensionsVersion)" />
+    <PackageVersion Include="Microsoft.Extensions.Configuration.Json" Version="$(MSExtensionsVersion)" />
+    <PackageVersion Include="Microsoft.Extensions.Configuration.UserSecrets" Version="$(MSExtensionsVersion)" />
+    <PackageVersion Include="Microsoft.Extensions.DependencyInjection" Version="$(MSExtensionsVersion)" />
+    <PackageVersion Include="Microsoft.Extensions.DependencyInjection.Abstractions" Version="$(MSExtensionsVersion)" />
+    <PackageVersion Include="Microsoft.Extensions.Hosting" Version="$(MSExtensionsVersion)" />
+    <PackageVersion Include="Microsoft.Extensions.Http" Version="$(MSExtensionsVersion)" />
+    <PackageVersion Include="Microsoft.Extensions.Http.Resilience" Version="9.2.0" IsPrerelease="false" />
+    <PackageVersion Include="Microsoft.Extensions.Logging" Version="$(MSExtensionsVersion)" />
+    <PackageVersion Include="Microsoft.Extensions.Logging.Console" Version="$(MSExtensionsVersion)" />
+    <PackageVersion Include="Microsoft.Extensions.Logging.Debug" Version="$(MSExtensionsVersion)" />
+    <PackageVersion Include="Microsoft.VisualStudio.Azure.Containers.Tools.Targets" Version="1.22.1-Preview.1" IsPrerelease="true" />
+    
+    <!-- OpenTelemetry -->
+    <PackageVersion Include="OpenTelemetry.Exporter.OpenTelemetryProtocol" Version="$(OpenTelemetryVersion)" />
+    <PackageVersion Include="OpenTelemetry.Extensions.Hosting" Version="$(OpenTelemetryVersion)" />
+    <PackageVersion Include="OpenTelemetry.Instrumentation.AspNetCore" Version="$(OpenTelemetryInstrumentationVersion)" />
+    <PackageVersion Include="OpenTelemetry.Instrumentation.Http" Version="$(OpenTelemetryInstrumentationVersion)" />
+    <PackageVersion Include="OpenTelemetry.Instrumentation.Runtime" Version="$(OpenTelemetryInstrumentationVersion)" />
+    
+    <!-- Semantic Kernel -->
+    <PackageVersion Include="Microsoft.SemanticKernel" Version="$(SemanticKernelVersion)" />
+    <PackageVersion Include="Microsoft.SemanticKernel.Abstractions" Version="$(SemanticKernelVersion)" />
+    <PackageVersion Include="Microsoft.SemanticKernel.Agents.Core" Version="$(SemanticKernelPreviewVersion)" IsPrerelease="true" />
+    <PackageVersion Include="Microsoft.SemanticKernel.Connectors.AzureOpenAI" Version="$(SemanticKernelVersion)" />
+    <PackageVersion Include="Microsoft.SemanticKernel.Connectors.OpenAI" Version="$(SemanticKernelVersion)" />
+    <PackageVersion Include="Microsoft.SemanticKernel.Core" Version="$(SemanticKernelVersion)" />
+    
+    <!-- Swagger -->
+    <PackageVersion Include="Swashbuckle.AspNetCore" Version="$(SwashbuckleVersion)" />
+    <PackageVersion Include="Swashbuckle.AspNetCore.Annotations" Version="$(SwashbuckleVersion)" />
+    
+    <!-- Testing -->
+    <PackageVersion Include="Aspire.Hosting.Testing" Version="9.1.0" />
+    <PackageVersion Include="coverlet.collector" Version="6.0.4" />
+    <PackageVersion Include="Microsoft.NET.Test.Sdk" Version="17.14.0-preview-25107-01" IsPrerelease="true" />
+    <PackageVersion Include="xunit" Version="2.9.3" />
+    <PackageVersion Include="xunit.runner.visualstudio" Version="3.0.2" />
+    
+    <!-- Other -->
+    <PackageVersion Include="AutoMapper" Version="14.0.0" />
+    <PackageVersion Include="Handlebars.Net" Version="2.1.6" />
+  </ItemGroup>
+</Project> 

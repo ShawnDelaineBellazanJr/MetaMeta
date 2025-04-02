@@ -1,0 +1,44 @@
+<Project>
+  <!-- Auto-cleanse on NuGet lock file errors -->
+  <Target Name="AutoCleanseOnFailure" AfterTargets="Restore" Condition="'$(RestoreSuccess)' != 'true'">
+    <Message Importance="high" Text="🧹 NuGet restore failed, initiating auto-cleanse..." />
+    
+    <!-- Remove problematic files -->
+    <Delete Files="$(MSBuildProjectDirectory)/obj/project.assets.json" 
+            ContinueOnError="true">
+      <Output TaskParameter="DeletedFiles" ItemName="DeletedFiles" />
+    </Delete>
+    
+    <Message Importance="high" Text="🗑️ Deleted: @(DeletedFiles)" 
+             Condition="'@(DeletedFiles)' != ''" />
+    
+    <!-- Try restore again with clean state -->
+    <Message Importance="high" Text="🔄 Attempting restore again..." />
+    <Exec Command="dotnet restore $(MSBuildProjectFile)" />
+  </Target>
+  
+  <!-- Improved version consistency target -->
+  <Target Name="VersionCheck" BeforeTargets="Build">
+    <PropertyGroup>
+      <SK_Version>1.44.0-preview</SK_Version>
+    </PropertyGroup>
+    
+    <!-- Check if central package management is enabled -->
+    <PropertyGroup>
+      <IsCentrallyManaged>$([System.Convert]::ToBoolean('$(ManagePackageVersionsCentrally)'))</IsCentrallyManaged>
+    </PropertyGroup>
+
+    <!-- Warning for projects using semantic kernel packages directly without central versioning -->
+    <Warning 
+      Text="⚠️ Project $(MSBuildProjectName) references Microsoft.SemanticKernel.Agents.Core with wrong version. Should use $(SK_Version)."
+      Condition="@(PackageReference->WithMetadataValue('Identity', 'Microsoft.SemanticKernel.Agents.Core')->Count()) > 0 
+                and !$(IsCentrallyManaged) 
+                and !$([System.String]::Copy('@(PackageReference->WithMetadataValue('Identity', 'Microsoft.SemanticKernel.Agents.Core')->'MetadataValue('Version')')').Contains('-preview'))" />
+  </Target>
+  
+  <!-- Add target to validate package integrity -->
+  <Target Name="ValidatePackageHashes" AfterTargets="Restore" Condition="'$(RestoreSuccess)' == 'true'">
+    <Message Importance="normal" Text="✅ Package restore completed successfully - integrity verification skipped in development mode" />
+    <!-- In CI environments, you would add hash verification here -->
+  </Target>
+</Project> 

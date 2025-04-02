@@ -1,0 +1,98 @@
+name: Package Management Validation
+
+on:
+  push:
+    branches: [ main, dev ]
+    paths:
+      - '**/*.csproj'
+      - 'Directory.Packages.props'
+      - 'Directory.Build.targets'
+      - 'Directory.Build.props'
+      - 'global.json'
+  pull_request:
+    branches: [ main, dev ]
+    paths:
+      - '**/*.csproj'
+      - 'Directory.Packages.props'
+      - 'Directory.Build.targets'
+      - 'Directory.Build.props'
+      - 'global.json'
+  workflow_dispatch:
+
+jobs:
+  validate-package-management:
+    name: Validate Package Management
+    runs-on: ubuntu-latest
+    
+    steps:
+    - uses: actions/checkout@v3
+      
+    - name: Setup .NET
+      uses: actions/setup-dotnet@v3
+      with:
+        dotnet-version: '8.0.x'
+        
+    - name: Verify SDK Version
+      run: |
+        CONFIGURED_SDK=$(cat global.json | grep -o '"version": "[^"]*"' | cut -d'"' -f4)
+        INSTALLED_SDK=$(dotnet --version)
+        echo "Configured SDK: $CONFIGURED_SDK"
+        echo "Installed SDK: $INSTALLED_SDK"
+        if [[ "$INSTALLED_SDK" != "$CONFIGURED_SDK"* ]]; then
+          echo "::error::SDK version mismatch! Configured: $CONFIGURED_SDK, Installed: $INSTALLED_SDK"
+          exit 1
+        fi
+    
+    - name: Verify Central Package Management
+      run: |
+        # Check if all projects use central package management
+        NON_CPM_PROJECTS=$(find src tests -name "*.csproj" | xargs grep -L "<ManagePackageVersionsCentrally>true</ManagePackageVersionsCentrally>" || true)
+        
+        if [ -n "$NON_CPM_PROJECTS" ]; then
+          echo "::error::Found projects not using central package management:"
+          echo "$NON_CPM_PROJECTS"
+          exit 1
+        fi
+        
+        # Check if Directory.Packages.props exists
+        if [ ! -f "Directory.Packages.props" ]; then
+          echo "::error::Directory.Packages.props file not found"
+          exit 1
+        fi
+        
+        echo "✅ All projects using central package management"
+    
+    - name: Verify No Version Attributes
+      run: |
+        # Check if any project has package references with version attributes
+        VERSION_ATTR_PROJECTS=$(find src tests -name "*.csproj" | xargs grep -l '<PackageReference.*Version="' || true)
+        
+        if [ -n "$VERSION_ATTR_PROJECTS" ]; then
+          echo "::error::Found projects with explicit package version attributes:"
+          echo "$VERSION_ATTR_PROJECTS"
+          exit 1
+        fi
+        
+        echo "✅ No explicit package version attributes found"
+    
+    - name: .NET Restore
+      run: dotnet restore --force
+      
+    - name: .NET Build
+      run: dotnet build --no-restore
+      
+    - name: Check for Package Inconsistencies
+      run: |
+        # Use dotnet list package to find inconsistencies
+        dotnet list package --outdated > outdated_packages.txt
+        
+        # Check if any important packages are outdated
+        IMPORTANT_OUTDATED=$(grep -E "Microsoft.SemanticKernel|Microsoft.Extensions" outdated_packages.txt || true)
+        
+        if [ -n "$IMPORTANT_OUTDATED" ]; then
+          echo "::warning::Found outdated important packages:"
+          echo "$IMPORTANT_OUTDATED"
+          # Don't fail the build, just warn
+        fi
+        
+        echo "✅ Package consistency check completed" 

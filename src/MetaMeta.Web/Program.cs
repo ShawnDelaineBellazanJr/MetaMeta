@@ -2,6 +2,7 @@ using MetaMeta.ServiceDefaults;
 using MetaMeta.ServiceDefaults.Configurations;
 using MetaMeta.Web;
 using MetaMeta.Web.Components;
+using MetaMeta.Web.Extensions;
 
 var builder = WebApplication.CreateBuilder(args);
 

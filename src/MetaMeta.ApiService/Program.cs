@@ -6,6 +6,7 @@ using MetaMeta.Orchestration;
 using MetaMeta.Core.Abstractions;
 using MetaMeta.Core.PromptTemplates;
 using Microsoft.Extensions.Configuration;
+using MetaMeta.ApiService.Extensions;
 
 var builder = WebApplication.CreateBuilder(args);
 
