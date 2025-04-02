@@ -1,0 +1,104 @@
+name: Build and Test MetaMeta
+
+on:
+  push:
+    branches: [ main ]
+  pull_request:
+    branches: [ main ]
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    
+    steps:
+    - name: Checkout Repository
+      uses: actions/checkout@v4
+      with:
+        fetch-depth: 0
+
+    - name: Setup .NET 9 SDK
+      uses: actions/setup-dotnet@v4
+      with:
+        dotnet-version: 9.0.x
+
+    - name: Cache NuGet Packages
+      uses: actions/cache@v3
+      with:
+        path: ~/.nuget/packages
+        key: ${{ runner.os }}-nuget-${{ hashFiles('**/*.csproj') }}
+        restore-keys: |
+          ${{ runner.os }}-nuget-
+
+    - name: Restore Dependencies
+      run: dotnet restore MetaMeta.sln
+
+    - name: Build Solution
+      run: dotnet build MetaMeta.sln --configuration Release --no-restore
+
+    - name: Run Tests
+      run: dotnet test MetaMeta.sln --configuration Release --no-build --collect:"XPlat Code Coverage" --logger "trx;LogFileName=test-results.trx"
+
+    - name: Upload Test Results
+      if: always()
+      uses: actions/upload-artifact@v4
+      with:
+        name: test-results
+        path: '**/TestResults/*.trx'
+        retention-days: 7
+
+    - name: Upload Code Coverage
+      if: always()
+      uses: actions/upload-artifact@v4
+      with:
+        name: code-coverage
+        path: '**/TestResults/**/coverage.cobertura.xml'
+        retention-days: 7
+    
+    - name: Validate .prompty Files
+      run: |
+        echo "Validating .prompty files structure"
+        find src -name "*.prompty" | grep -v "src/.*/Prompts/.*\.prompty" && echo "Error: .prompty files should be in Prompts/ directories" && exit 1 || echo "All .prompty files in correct directories"
+
+    - name: Check Agent Inheritance
+      run: |
+        echo "Validating agent classes inherit from AgentBase"
+        grep -rL "AgentBase<.*,.*>" --include="*.cs" src/MetaMeta.*/Agents | grep "Agent\.cs" && echo "Error: Found agent classes not inheriting from AgentBase" && exit 1 || echo "All agent classes inherit from AgentBase"
+        
+    - name: Validate ReasoningAgent
+      run: |
+        echo "Validating ReasoningAgent functionality"
+        echo '{
+          "requestId": "test-request-001",
+          "sessionId": "test-session-abc",
+          "assistant": "ReasoningBot9000",
+          "problem": "Start bank account",
+          "style": "Analytical",
+          "maxSteps": 3,
+          "includeAlternatives": true,
+          "metadata": {
+            "additionalProp1": "User has no prior credit",
+            "additionalProp2": "Age 18+",
+            "additionalProp3": "Wants online account"
+          }
+        }' > reasoning-request.json
+        
+        # Start the service (build and run in background)
+        dotnet run --project src/MetaMeta.AppHost &
+        PID=$!
+        
+        # Wait for service to start
+        sleep 15
+        
+        # Test the API
+        RESPONSE=$(curl -s -X POST http://localhost:5485/api/reasoning/analyze -H "Content-Type: application/json" -d @reasoning-request.json)
+        
+        # Kill the background process
+        kill $PID
+        
+        # Check if response contains error
+        if [[ $RESPONSE == *"error"* ]]; then
+          echo "ReasoningAgent validation failed: $RESPONSE"
+          exit 1
+        else
+          echo "ReasoningAgent validation succeeded"
+        fi

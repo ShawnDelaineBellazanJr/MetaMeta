@@ -1,0 +1,88 @@
+{
+  "name": "MetaMeta Development",
+  
+  // Use Docker Compose for more control over the environment
+  "dockerComposeFile": ["docker-compose.yml"],
+  "service": "app",
+  "workspaceFolder": "/workspaces/MetaMeta",
+  
+  // Set the remoteUser property to work with GitHub Codespaces
+  "remoteUser": "vscode",
+  
+  // Features to install in the dev container for additional capabilities
+  "features": {
+    "ghcr.io/devcontainers/features/github-cli:1": {},
+    "ghcr.io/devcontainers/features/powershell:1": {},
+    "ghcr.io/devcontainers/features/docker-in-docker:2": {}
+  },
+  
+  // Configure container-specific settings
+  "containerEnv": {
+    "ASPNETCORE_ENVIRONMENT": "Development",
+    "DOTNET_NOLOGO": "true",
+    "DOTNET_SKIP_FIRST_TIME_EXPERIENCE": "true"
+  },
+  
+  // Forward ports for services
+  "forwardPorts": [
+    5000, // REST API
+    7100, // gRPC service
+    3000, // Web UI
+    58000 // Aspire dashboard
+  ],
+  
+  // Use 'postCreateCommand' to run commands after the container is created
+  "postCreateCommand": "dotnet restore && dotnet build && echo 'Container setup complete!'",
+  
+  // Copy the Prompts folder into the container
+  "postStartCommand": "mkdir -p /workspaces/MetaMeta/Prompts && cp -r .Prompts/* /workspaces/MetaMeta/Prompts/ 2>/dev/null || echo 'No prompts to copy'",
+  
+  // Configure VSCode-specific settings
+  "customizations": {
+    "vscode": {
+      // Set default settings for VS Code
+      "settings": {
+        "terminal.integrated.defaultProfile.linux": "bash",
+        "omnisharp.enableRoslynAnalyzers": true,
+        "omnisharp.enableEditorConfigSupport": true,
+        "editor.formatOnSave": true,
+        "editor.codeActionsOnSave": {
+          "source.organizeImports": true,
+          "source.fixAll": true
+        },
+        "dotnet.completion.showCompletionItemsFromUnimportedNamespaces": true,
+        "csharp.semanticHighlighting.enabled": true
+      },
+      
+      // Recommend extensions for the development environment
+      "extensions": [
+        "ms-dotnettools.csharp",
+        "ms-dotnettools.csdevkit",
+        "ms-dotnettools.dotnet-interactive-vscode",
+        "ms-azuretools.vscode-docker",
+        "ms-vscode-remote.remote-containers",
+        "ms-vscode-remote.remote-wsl",
+        "github.codespaces",
+        "bradlc.vscode-tailwindcss",
+        "dbaeumer.vscode-eslint",
+        "esbenp.prettier-vscode",
+        "github.vscode-github-actions",
+        "github.vscode-pull-request-github",
+        "cursor.cursor",
+        "handlebars.handlebars"
+      ]
+    }
+  },
+  
+  // Configure host requirements
+  "hostRequirements": {
+    "cpus": 4,
+    "memory": "8gb",
+    "storage": "32gb"
+  },
+  
+  // Additional dev container properties
+  "waitFor": "postCreateCommand",
+  "updateContentCommand": "dotnet restore",
+  "shutdownAction": "stopContainer"
+} 

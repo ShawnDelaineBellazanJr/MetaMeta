@@ -1,6 +1,4 @@
 ﻿using Microsoft.SemanticKernel;
-using Microsoft.SemanticKernel.Agents;
-using Microsoft.SemanticKernel.ChatCompletion;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -19,20 +17,16 @@ namespace MetaMeta.Orchestration
     /// </remarks>
     public class NorthStarDirective
     {
-        // @meta:Agent - The executive agent that generates the vision and plan
-        private readonly ChatCompletionAgent _agent;
+        // The kernel instance for executing prompts
+        private readonly Kernel _kernel;
 
         /// <summary>
-        /// Initializes a new instance of the NorthStarDirective class with a configured executive agent.
+        /// Initializes a new instance of the NorthStarDirective class with a configured kernel.
         /// </summary>
-        public NorthStarDirective()
+        /// <param name="kernel">The Semantic Kernel instance to use for executing prompts.</param>
+        public NorthStarDirective(Kernel kernel)
         {
-            _agent = new()
-            {
-                Name = "NorthStar",
-                Instructions = "You are an executive agent. Given a goal and session, return a vision and metadata in JSON format.",
-                Description = "Generates a directive from high-level goal input.",
-            };
+            _kernel = kernel ?? throw new ArgumentNullException(nameof(kernel));
         }
 
         /// <summary>
@@ -67,11 +61,20 @@ namespace MetaMeta.Orchestration
         /// <returns>A string containing the generated execution plan.</returns>
         public async Task<string?> Objective(string goal)
         {
-            // Step 1: Run the agent with the goal as input prompt
-            var response = await _agent.Kernel.InvokePromptAsync($"steps to achieve goal: {goal}");
+            // Create the prompt for generating a plan
+            var prompt = new StringBuilder();
+            prompt.AppendLine("You are an executive agent responsible for planning and coordinating complex tasks.");
+            prompt.AppendLine("Given a goal, generate a clear, structured plan with specific steps to achieve it.");
+            prompt.AppendLine();
+            prompt.AppendLine($"GOAL: {goal}");
+            prompt.AppendLine();
+            prompt.AppendLine("EXECUTION PLAN:");
             
-            // Step 2: Map the response to the directive's structure
-            return response.RenderedPrompt;
+            // Execute the prompt
+            var result = await _kernel.InvokePromptAsync(prompt.ToString());
+            
+            // Return the generated plan
+            return result.GetValue<string>();
         }
     }
 }

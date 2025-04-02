@@ -1,11 +1,31 @@
+# Build results
+[Bb]in/
+[Oo]bj/
+
 # Visual Studio files
 .vs/
+.vscode/
 *.user
 *.userosscache
 *.suo
 *.vsidx
-[Bb]in/
-[Oo]bj/
-#.NET Core
+
+# JetBrains Rider files
+.idea/
+
+# DevContainer specific
+.devcontainer/.env
+.docker/
+
+# Logs
+logs/
+
+# Docker volumes
+**/volumes/
+
+# .NET Core
 project.lock.json
 artifacts/
+
+# Misc
+.fake

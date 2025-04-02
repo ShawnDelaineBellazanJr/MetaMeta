@@ -3,8 +3,15 @@ description:
 globs: 
 alwaysApply: false
 ---
-# Cursor Rule: 004_plugins.mdc
-# Title: Plugin Standards for Semantic Kernel Compatibility
+RULE: Plugin registration must follow the pattern:
+- `kernel.Plugins.AddFromObject(pluginInstance, "PluginNamespace");`
+- Plugin namespace must match the class-level `[KernelPlugin("Xyz")]`
+- Only register domain-specific plugins in their respective agent contexts
+- Shared plugins (e.g., TextProcessing) can be registered globally
+
+IF Cursor generates a plugin:
+- It MUST also update the corresponding `PluginRegistration.cs`
+- It MUST NOT register the plugin in unrelated agents
 
 ## Purpose:
 Standardize the structure, safety, and composability of SK-compatible plugins used by assistants. Plugins extend assistant capabilities using the SK `KernelPlugin` interface and should be reusable across assistants and planners.

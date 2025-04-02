@@ -2,6 +2,10 @@
 using MetaMeta.ServiceDefaults;
 using MetaMeta.ServiceDefaults.Configurations;
 using Microsoft.OpenApi.Models;
+using MetaMeta.Orchestration;
+using MetaMeta.Core.Abstractions;
+using MetaMeta.Core.PromptTemplates;
+using Microsoft.Extensions.Configuration;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -29,6 +33,12 @@ builder.Services.AddSwaggerGen(options =>
         Description = "Autonomous Agent API for executing NorthStar-aligned goals."
     });
 });
+
+// 🆕 Add Semantic Kernel and Agents
+builder.Services.AddSingleton<IPromptTemplateFactory, HandlebarsPromptTemplateFactory>();
+
+// 🆕 Add Orchestration services with configuration
+builder.Services.AddOrchestrationServices(builder.Configuration);
 
 // ✅ Build the app
 var app = builder.Build();

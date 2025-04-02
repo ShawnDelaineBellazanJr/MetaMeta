@@ -1,0 +1,42 @@
+version: '3.8'
+
+services:
+  # Development container for MetaMeta
+  app:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    volumes:
+      # Mount the root of the project into /workspaces/MetaMeta
+      - ..:/workspaces/MetaMeta:cached
+      # Mount Docker socket for container-in-container support
+      - /var/run/docker.sock:/var/run/docker.sock
+    
+    # Port forwarding for services
+    ports:
+      - "5000:5000"  # REST API
+      - "7100:7100"  # gRPC service
+      - "3000:3000"  # Web UI
+      - "58000:58000" # Aspire dashboard
+    
+    # Keep the container running
+    command: /bin/sh -c "while sleep 1000; do :; done"
+    
+    # Security options for Docker-in-Docker
+    security_opt:
+      - seccomp:unconfined
+    
+    # Use host network for better performance with WSL2
+    # Comment this out if not using WSL2 or if you encounter issues
+    # network_mode: "host"
+    
+    # Enable interactive session
+    stdin_open: true
+    tty: true
+    
+    # Set environment variables
+    environment:
+      - ASPNETCORE_ENVIRONMENT=Development
+      - DOTNET_NOLOGO=true
+      - DOTNET_SKIP_FIRST_TIME_EXPERIENCE=true
+      - ASPIRE_DASHBOARD_PORT=58000 

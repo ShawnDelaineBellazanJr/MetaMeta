@@ -1,0 +1,25 @@
+{
+    "name": "Validate Reasoning Agent",
+    "description": "Start AppHost and test ReasoningAgent via REST endpoint",
+    "shell": [
+      "# Build the solution",
+      "dotnet build MetaMeta.sln",
+      
+      "# Start the service (run in background)",
+      "Write-Host \"Starting MetaMeta.AppHost...\"",
+      "Start-Process -FilePath \"dotnet\" -ArgumentList \"run --project src/MetaMeta.AppHost\" -WindowStyle Hidden",
+      
+      "# Wait for service to start",
+      "Write-Host \"Waiting for services to start...\"",
+      "Start-Sleep -s 15", 
+  
+      "# Test the API",
+      "Write-Host \"Testing ReasoningAgent API...\"",
+      "curl -X POST http://localhost:5485/api/reasoning/analyze -H \"Content-Type: application/json\" -d @reasoning-request.json",
+      
+      "# Cleanup (optional)",
+      "Write-Host \"Test complete. Stopping background processes...\"",
+      "Get-Process | Where-Object { $_.ProcessName -eq 'dotnet' -and $_.MainWindowTitle -eq '' } | Stop-Process -Force"
+    ]
+  }
+  

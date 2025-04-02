@@ -1,0 +1,10 @@
+{{$system_prompt}}
+
+PERSONA: {{$persona}}
+
+CONVERSATION HISTORY:
+{{$conversation_history}}
+
+USER: {{$message}}
+
+Respond to the user's message in a helpful, accurate, and natural way. Maintain the conversation context and adhere to the persona specified. If you need clarification, ask specific questions. Your response should be directly useful to the user without preamble or explanation of what you're doing. 

@@ -1,0 +1,20 @@
+###
+# Test the reasoning API endpoint
+# Click 'Send Request' above this code to execute
+###
+POST http://localhost:5000/api/reasoning/analyze
+Content-Type: application/json
+
+{
+  "requestId": "test-123",
+  "sessionId": "session-456",
+  "assistant": "ReasoningAPI",
+  "problem": "Start a new bank account",
+  "style": "Analytical",
+  "maxSteps": 5,
+  "includeAlternatives": false,
+  "metadata": {
+    "context": "For a freelance developer",
+    "priority": "high"
+  }
+} 

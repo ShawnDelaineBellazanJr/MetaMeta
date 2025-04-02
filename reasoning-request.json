@@ -1,0 +1,14 @@
+{
+    "requestId": "test-request-001",
+    "sessionId": "test-session-abc",
+    "assistant": "ReasoningBot9000",
+    "problem": "Start bank account",
+    "style": "Analytical",
+    "maxSteps": 3,
+    "includeAlternatives": true,
+    "metadata": {
+      "additionalProp1": "User has no prior credit",
+      "additionalProp2": "Age 18+",
+      "additionalProp3": "Wants online account"
+    }
+}
