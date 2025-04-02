@@ -1,0 +1,11 @@
+# Visual Studio files
+.vs/
+*.user
+*.userosscache
+*.suo
+*.vsidx
+[Bb]in/
+[Oo]bj/
+#.NET Core
+project.lock.json
+artifacts/
