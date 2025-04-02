@@ -27,5 +27,8 @@ logs/
 project.lock.json
 artifacts/
 
+# Cursor IDE
+.cursor/
+
 # Misc
 .fake
