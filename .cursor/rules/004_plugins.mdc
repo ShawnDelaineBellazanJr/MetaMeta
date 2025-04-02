@@ -1,0 +1,56 @@
+---
+description: 
+globs: 
+alwaysApply: false
+---
+# Cursor Rule: 004_plugins.mdc
+# Title: Plugin Standards for Semantic Kernel Compatibility
+
+## Purpose:
+Standardize the structure, safety, and composability of SK-compatible plugins used by assistants. Plugins extend assistant capabilities using the SK `KernelPlugin` interface and should be reusable across assistants and planners.
+
+---
+
+## Requirements
+
+### ✅ Plugin Structure
+- All plugins MUST be implemented as a class or service that exposes SKFunction-compatible methods
+- Each plugin MUST be loadable via `kernel.ImportPluginFromObject(...)`
+- Plugin class names MUST use the suffix `Plugin` (e.g. `MarkdownFormatterPlugin`, `VoiceFormatterPlugin`)
+
+### ✅ Plugin Registration
+- Plugins MUST be registered in Program.cs or agent constructors
+- Plugin functions MUST declare clear SKFunction attributes or use method naming for discoverability
+- Plugins MAY be imported from `Plugins/` and reused across services
+
+### ✅ File & Folder Layout
+
+```
+src/Plugins/
+├── <PluginName>/
+│   ├── <PluginClass>.cs
+│   └── [helpers, validators, etc.]
+```
+
+### ✅ Safety & Testability
+- Plugin methods MUST validate inputs (e.g. empty strings, bad formats)
+- Plugin methods SHOULD be testable in isolation
+- Plugins SHOULD avoid side effects unless explicitly required (e.g. file writing)
+
+### ✅ Output & Behavior
+- All plugin outputs MUST be clean, structured strings or SK return objects
+- Plugins SHOULD support async execution
+
+---
+
+## Optional Enhancements
+
+- Plugins MAY include metadata for SK discovery
+- Plugins MAY support runtime enable/disable via flags or configuration
+- Plugin directories MAY include prompt usage examples
+
+---
+
+## Enforcement
+
+> Cursor agents enforcing this rule must ensure plugin naming, structure, safety practices, and testability. Each plugin must be reusable, composable, and easy to wire into any agent or planner.

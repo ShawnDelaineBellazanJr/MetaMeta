@@ -1,0 +1,68 @@
+---
+description: 
+globs: 
+alwaysApply: false
+---
+# Cursor Rule: 002_runtime.mdc
+# Title: AgentRuntimeService Standards (gRPC Runtime Invocation)
+
+## Purpose:
+Defines the structural and behavioral standards for the AgentRuntimeService project. This includes gRPC interfaces, agent invocation flow, registration, and contract safety. It ensures the runtime can dynamically route, invoke, and manage AI assistants consistently and safely across environments.
+
+---
+
+## Requirements
+
+### ✅ Project Role
+- The `AgentRuntimeService` project MUST expose a gRPC server that implements the `AgentCore` service
+- This project MUST serve as a runtime execution layer for invoking assistants by name
+- It MAY support additional REST translation layers or HTTP proxying
+
+### ✅ gRPC Contract Requirements
+- The `.proto` file MUST define:
+  - `InvokeAgentRequest` (with agentName + input)
+  - `AgentResponse`
+  - `AgentMetadata` (for registration)
+  - `AgentList` (for discovery)
+- All messages MUST use `proto3` format
+- The proto file MUST be located under: `Protos/agent_runtime.proto`
+- Service name MUST be `AgentCore` and namespace should match the project
+
+### ✅ Service Implementation
+- A gRPC service class (e.g. `AgentRuntimeGrpc`) MUST implement `AgentCore.AgentCoreBase`
+- The service MUST:
+  - Retrieve agents from `AgentRegistry`
+  - Invoke `IAgent.InvokeAsync(input)` safely
+  - Return serialized result
+- Error handling MUST be included
+- Logging of traceId or invocation metadata SHOULD be included
+
+### ✅ Agent Registry Integration
+- The runtime MUST receive an injected instance of `AgentRegistry`
+- The registry MAY be populated during service startup
+- Future support MAY include remote registration or CosmosDB-backed registry
+
+### ✅ Health, Config, and Observability
+- Runtime service MUST expose a `/health` endpoint
+- ServiceDefaults MUST be used for gRPC + Health + Logging
+- gRPC server startup MUST be declared in `Program.cs`
+
+---
+
+## Folder Structure (Required)
+
+```
+AgentRuntimeService/
+├── Services/
+│   └── AgentRuntimeGrpc.cs
+├── Protos/
+│   └── agent_runtime.proto
+├── Program.cs
+├── AgentRuntimeService.csproj
+```
+
+---
+
+## Enforcement
+
+> Cursor agents enforcing this rule must ensure all runtime logic strictly routes assistant execution via the gRPC service. This separates assistant logic from orchestration logic and enables pluggable, dynamic AI mesh control. Contracts must follow the AgentCore proto spec and input must be validated.

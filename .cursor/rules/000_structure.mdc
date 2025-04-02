@@ -1,0 +1,58 @@
+---
+description: 
+globs: 
+alwaysApply: false
+---
+# ✅ Rule 000: Enforce MetaMeta Modular Folder Structure
+
+## 📁 Enforced Layout
+
+The following structure must be maintained inside `/src`:
+
+- src/MetaMeta.AppHost/
+- src/MetaMeta.AgentHost/
+- src/MetaMeta.ApiService/
+- src/MetaMeta.Web/
+- src/MetaMeta.GrpcService/
+- src/MetaMeta.Orchestration/
+- src/MetaMeta.ServiceDefaults/
+- src/MetaMeta.Configs/
+- src/MetaMeta.Infrastructure/
+- src/MetaMeta.Core/
+  - Agents/
+  - Plugins/
+  - Prompts/
+  - Runtime/
+
+All test projects must reside in:
+- tests/MetaMeta.[Project].Tests/
+
+## 🚫 Forbidden Structures
+
+- No folders like `Agents/`, `Plugins/`, `Prompts/` directly inside `src/`
+- No duplicate projects like `OrchestrationAgent/` or `*.Tests/` inside `src/`
+- No “backup” folders inside `src/` (move them to root or archive)
+- No scaffolded top-level folders outside defined modular projects
+
+## ✅ Enforced Naming
+
+- All top-level folders must follow `MetaMeta.[DomainName]`
+- Agent classes must be named `[Something]Assistant.cs`
+- Plugins must be named `[Capability]Plugin.cs`
+- Prompts must end in `.prompty` and live in `src/MetaMeta.Core/Prompts`
+
+## ⚙️ What Cursor Should Do
+
+When generating:
+- Place new agents inside: `src/MetaMeta.Core/Agents/`
+- Place new plugins inside: `src/MetaMeta.Core/Plugins/`
+- Create any new projects under the `MetaMeta.[Domain]` naming convention
+- Update `.sln` file references to match new project locations
+
+## 🧠 Reasoning
+
+This structure:
+- Keeps architecture modular and understandable
+- Enables scalable AI agent orchestration
+- Prevents Cursor from generating project folder clutter
+

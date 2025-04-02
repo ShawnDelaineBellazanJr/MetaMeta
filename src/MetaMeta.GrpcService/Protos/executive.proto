@@ -1,0 +1,25 @@
+syntax = "proto3";
+
+option csharp_namespace = "MetaMeta.GrpcService.Protos";
+
+package executive;
+
+service ExecutiveAgent {
+  // Executes a goal aligned to the organization's North Star vision and assistant context
+  rpc NorthStar (ExecutiveRequest) returns (ExecutiveResponse);
+}
+
+message ExecutiveRequest {
+  string assistant = 1;        // The name of the requesting assistant (e.g. "TranscriptAssistant")
+  string goal = 2;             // The specific task to accomplish
+  string northStar = 3;        // Long-term vision or mission context
+  string sessionId = 4;        // Optional session ID for traceability
+  map<string, string> metadata = 5; // Optional execution metadata (e.g. tags, labels, env)
+}
+
+message ExecutiveResponse {
+  repeated string results = 1;   // Ordered results of plugin execution
+  string plan = 2;               // Full execution plan used for the task (JSON)
+  string traceId = 3;            // Optional trace ID for auditing/logging
+  string timestamp = 4;          // Execution timestamp (RFC3339 format)
+}

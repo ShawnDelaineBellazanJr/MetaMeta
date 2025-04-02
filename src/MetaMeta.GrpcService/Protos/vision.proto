@@ -1,0 +1,17 @@
+syntax = "proto3";
+
+option csharp_namespace = "MetaMeta.GrpcService.Protos";
+
+service VisionAssistant {
+  // Executes a goal aligned to the organization's North Star vision and assistant context
+  rpc NorthStar (ExecutiveRequest) returns (ExecutiveResponse);
+}
+
+message VisionRequest {
+	string text = 1;        // The name of the requesting assistant (e.g. "TranscriptAssistant")
+}
+
+message VisionResponse {
+		string text = 1;        // The name of the requesting assistant (e.g. "TranscriptAssistant")
+
+}

@@ -1,0 +1,43 @@
+# Cursor Rule: 008_personas.mdc
+# Title: Assistant Persona and Behavior Design
+
+## Purpose:
+Define structure and guidance for crafting consistent, role-based assistant personas that are traceable, reusable, and aligned with their responsibilities. Personas shape tone, output style, and agent identity.
+
+---
+
+## Requirements
+
+### ✅ Persona Definitions
+- Each assistant MUST define its persona in one of:
+  - `.prompty` file (`system:` section)
+  - `PromptInstructions.md`
+  - `AgentMetadata` entry
+
+### ✅ Attributes to Include
+- Role (e.g., Planner, Reviewer, Voice Assistant)
+- Tone (e.g., friendly, concise, instructive)
+- Skill emphasis (e.g., code generation, documentation, feedback)
+- Behavior example (optional)
+
+### ✅ Folder & File Layout
+```
+src/<AssistantName>/
+├── Prompts/
+│   └── <PromptName>.prompty
+├── PromptInstructions.md
+```
+
+---
+
+## Optional Enhancements
+
+- Personas MAY be stored centrally in a `PersonaStore/` directory
+- AssistantController or orchestrators MAY query personas for context
+- Agents MAY use `AgentMetadata` for persona summary
+
+---
+
+## Enforcement
+
+> Cursor agents enforcing this rule should verify that each assistant documents its persona clearly, consistently, and accessibly—via prompt, markdown, or metadata.

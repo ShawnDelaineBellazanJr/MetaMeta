@@ -1,0 +1,67 @@
+# Cursor Rule: 006_prompts.mdc
+# Title: Prompty Standards for Assistant Prompt Templates
+
+## Purpose:
+Ensure all assistant logic is powered by reusable, version-controlled Prompty templates. Prompts must follow a structured YAML format and support clean, debuggable, transparent behavior across all agents.
+
+---
+
+## Requirements
+
+### ✅ Prompty Files
+- All prompts MUST be stored as `.prompty` YAML files
+- Prompts MUST include:
+  - `name`
+  - `description`
+  - `model` section
+  - one or more `system`, `user`, or `assistant` roles
+
+### ✅ File & Folder Layout
+- Prompty files MUST live in:
+  ```
+  src/<AssistantName>/Prompts/<PromptName>.prompty
+  ```
+
+### ✅ Naming Convention
+- Prompt files MUST be named with PascalCase and end in `Prompt` (e.g., `PlanningPrompt.prompty`)
+- Prompt `name:` property inside file MUST match the filename
+
+### ✅ Prompt Usage in Code
+- Agents MUST use `kernel.CreateFunctionFromPromptyFile(...)` or equivalent loader
+- Inline prompts in code are NOT allowed
+- Prompt input parameters MUST use `{{$input}}` or well-typed keys
+
+---
+
+## Optional Enhancements
+
+- Prompts MAY use `{{$input}}`, `{{$goal}}`, `{{$task}}` etc. with parameter dictionaries
+- Prompts MAY include `examples:` section for test input/output
+- Prompts MAY include `metadata:` for usage classification
+
+---
+
+## Example Prompt Template
+
+```yaml
+---
+name: PlanningPrompt
+description: Breaks goals into dev tasks
+model:
+  api: chat
+---
+
+system:
+You are a helpful planning assistant that breaks down software goals.
+
+user:
+{{$input}}
+
+assistant:
+```
+
+---
+
+## Enforcement
+
+> Cursor agents enforcing this rule must ensure prompt files are external `.prompty` YAML files with valid schema, live in proper assistant folders, and are loaded via Core IO loaders. Prompts must be traceable, clean, and versioned.

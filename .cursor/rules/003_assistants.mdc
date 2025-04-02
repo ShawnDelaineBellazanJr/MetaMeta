@@ -1,0 +1,66 @@
+---
+description: 
+globs: 
+alwaysApply: false
+---
+# Cursor Rule: 003_assistants.mdc
+# Title: Assistant Development Standards
+
+## Purpose:
+Establish standards and structural conventions for creating new AI assistants using the AgentCore runtime. Assistants must be modular, reusable, testable, and follow consistent Prompty + Core patterns. Each assistant functions as a standalone service or library that conforms to MetaMeta’s Copilot runtime.
+
+---
+
+## Requirements
+
+### ✅ Inheritance & Composition
+- All assistants MUST inherit from `AgentBase<TRequest, TResponse>` defined in `Core/Agents`
+- Each assistant MUST override `ExecuteAsync(TRequest)` to implement core logic
+- Agents MUST be registered using `AgentRegistry`
+
+### ✅ Prompty Files
+- Prompts MUST be external `.prompty` files stored under `/Prompts`
+- Assistant logic MUST NOT contain inline prompt templates
+- Prompt files MUST follow Prompty YAML structure and naming (e.g., `PlanningPrompt.prompty`)
+
+### ✅ Folder Layout
+
+```
+src/<AssistantName>/
+├── Agents/
+│   └── <Assistant>.cs
+├── Prompts/
+│   └── <PromptName>.prompty
+├── Controllers/ (optional)
+│   └── <AssistantController>.cs
+├── Program.cs
+├── <AssistantName>.csproj
+```
+
+### ✅ Naming Convention
+- Assistant projects MUST be named with the suffix `Assistant` (e.g. `PlanningAssistant`)
+- Agent class names MUST be PascalCase matching their service directory
+- All files MUST be scoped within their respective assistant directory
+
+### ✅ Agent Behavior
+- All assistants MUST support async invocation
+- JSON input MUST be deserialized to a typed class
+- All outputs MUST be returned as structured text or serialized JSON
+
+### ✅ Testability
+- Each assistant MUST be testable via unit or integration tests
+- Prompts SHOULD be testable with sample inputs + expected output
+
+---
+
+## Recommended Enhancements
+
+- Assistants SHOULD log input/output using shared observability utilities
+- Assistants MAY use plugins (Markdown, Voice, File) via Kernel extensions
+- Assistants MAY declare metadata for auto-discovery
+
+---
+
+## Enforcement
+
+> Cursor agents enforcing this rule must ensure assistant folders follow naming + structure, inherit from AgentBase<TRequest, TResponse>, and use external .prompty files only. Prompts must be well-formed, version-controlled, and linked in metadata.

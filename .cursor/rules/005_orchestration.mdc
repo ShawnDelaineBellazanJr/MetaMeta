@@ -1,0 +1,53 @@
+# Cursor Rule: 005_orchestration.mdc
+# Title: Multi-Agent Orchestration & Planner Standards
+
+## Purpose:
+Define orchestration and coordination standards for multi-agent systems, planners, and delegator agents within the MetaMeta ecosystem. Ensures modular, chainable, and intelligent workflows across assistants using standardized planning patterns.
+
+---
+
+## Requirements
+
+### ✅ Orchestrator Patterns
+- Orchestration logic MUST be implemented using one of the following:
+  - Option A: `CopilotAssistant` (centralized executive planner)
+  - Option B: `AgentHostPlanner` (host acts as planning router)
+  - Option C: `MetaPlannerPlugin` (planner-as-plugin model)
+- Each orchestrator MUST delegate to agents using `AgentUnitOfWork` or `Kernel.InvokeAsync(...)`
+- Planner agents MUST NOT hardcode agent class references; they MUST use names or service interfaces
+
+### ✅ Directory & Structure
+
+```
+src/Orchestration/
+├── CopilotAssistant/
+│   └── CopilotAgent.cs
+├── AgentHostPlanner/
+│   └── HostPlannerAgent.cs
+├── MetaPlannerPlugin/
+│   └── PlannerPlugin.cs
+```
+
+### ✅ Planning Behavior
+- Orchestrators MUST accept high-level goals and resolve which agents to invoke
+- Chaining MUST occur through explicit input/output mapping or dynamic evaluation
+- All steps MUST be traceable (logs or result chaining)
+- Planners SHOULD support context and memory sharing (via future plugin or planner memory)
+
+### ✅ Safety & Resilience
+- Planner agents MUST validate agent availability using `AgentRegistry`
+- Failures in agent execution MUST be handled gracefully with fallback or messages
+- Timeout logic MAY be applied per-agent step to prevent lockups
+
+---
+
+## Prompty Integration
+- Orchestrators MAY use `.prompty` files to generate planning chains
+- Prompts MUST be externalized under `Prompts/`
+- Prompt-driven planning MUST be transparent and traceable
+
+---
+
+## Enforcement
+
+> Cursor agents enforcing this rule must ensure orchestrators are modular, agent-aware, and follow approved delegation patterns. Planner agents must route through `AgentUnitOfWork` or Kernel, not through direct class coupling.

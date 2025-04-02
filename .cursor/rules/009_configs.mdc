@@ -1,0 +1,42 @@
+---
+description: 
+globs: 
+alwaysApply: false
+---
+# Cursor Rule: 009_configs.mdc
+# Title: Configuration, App Settings, and Environment Strategy
+
+## Purpose:
+Standardize app configuration patterns for local dev, containerization, and cloud deployment. Applies to assistant services, runtime, plugins, and orchestration logic.
+
+---
+
+## Requirements
+
+### ✅ Environment Handling
+- Each project MUST support `ASPNETCORE_ENVIRONMENT`
+- Configuration loading MUST include:
+  - `appsettings.json`
+  - `appsettings.Development.json`
+  - Environment variables
+- Secrets MUST NOT be hardcoded; use Azure Key Vault, user secrets, or GitHub secrets
+
+### ✅ Central Config (optional)
+- AppHost MAY include shared configuration values for all services
+- Common settings (e.g. Azure endpoints) MAY be injected via `IConfiguration`
+
+---
+
+## Folder Layout
+
+```
+src/<Service>/
+├── appsettings.json
+├── appsettings.Development.json
+```
+
+---
+
+## Enforcement
+
+> Cursor should ensure environment-aware config, no secrets in source, and testable settings loading per assistant and runtime service.

@@ -1,0 +1,65 @@
+# Cursor Rule: 007_tests.mdc
+# Title: Assistant and Core Testing Standards
+
+## Purpose:
+Establish unit and integration testing standards for all assistants, plugins, core components, and orchestration logic. Ensures that every component is testable, traceable, and verifiable via automated testing frameworks.
+
+---
+
+## Requirements
+
+### ✅ Project Layout
+- Test projects MUST be stored in `/tests/` and named to reflect their scope:
+  - `Core.Tests/`
+  - `Runtime.Tests/`
+  - `Assistants.Tests/`
+  - `Integration.Tests/`
+
+### ✅ Framework
+- xUnit, NUnit, or MSTest MAY be used
+- Projects MUST target `net8.0` or higher
+- Test projects MUST include references to tested components via project reference
+
+### ✅ Test Types
+- Assistants MUST include unit tests validating prompt interaction
+- Core MUST be tested for:
+  - AgentRegistry
+  - AgentUnitOfWork
+  - AgentBase inheritance
+- Plugins MUST include input/output safety and edge case coverage
+- Orchestration logic MUST include end-to-end flow tests with mocks or real agents
+
+---
+
+## Folder Structure
+
+```
+tests/
+├── Core.Tests/
+├── Runtime.Tests/
+├── Assistants.Tests/
+├── Integration.Tests/
+```
+
+---
+
+## Test Quality Rules
+
+- Tests MUST use clear, descriptive method names
+- Assertions MUST be precise and reproducible
+- Tests SHOULD cover expected and edge cases
+- Tests MAY include golden prompts or snapshot verification
+
+---
+
+## Recommended Enhancements
+
+- Cursor prompt tests MAY be included for `.prompty` verification
+- Assistant services MAY be tested via `WebApplicationFactory` or in-memory SK kernels
+- Coverage tooling MAY be included via coverlet or similar
+
+---
+
+## Enforcement
+
+> Cursor enforcement should verify presence of test projects, coverage for each assistant + core system, and best practice adherence (naming, scope, structure).
